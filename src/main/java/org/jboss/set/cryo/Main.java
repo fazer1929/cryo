@@ -70,7 +70,9 @@ public class Main {
 //            e.printStackTrace();
 //        }
 //    }
-
+    public static void startTimeTracker(){
+        TIME_TRACKER.start();
+    }
     public static void main(String[] args) throws Exception {
         TIME_TRACKER.start();
           // NOTE: does not seem we need args? branchName, URL etc can be retrieved from repo.
