@@ -1,65 +1,80 @@
-import org.jboss.set.cryo.Cryo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.jboss.set.cryo.Main;
 import org.jboss.set.cryo.process.ExecuteProcess;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CryoTest {
     private CryoAccess cryo;
+    private String repoURL;
 
-
-    CryoTest(){
-        ProcessBuilder processBuilder = new ProcessBuilder(new String[]{"git","clone","https://github.com/fazer1929/backup"});
-        ExecuteProcess executeProcess= new ExecuteProcess(processBuilder);
-        executeProcess.getProcessResult();
-        cryo=new CryoAccess();
-        cryo.createOperationCenter();
+    CryoTest() throws MalformedURLException {
+        repoURL = "https://github.com/fazer1929/backup";
+        cryo = new CryoAccess();
+        cryo.setUpCryo(repoURL);
+        Main.startTimeTracker();
+        System.out.println(System.setProperty("NO_STOP_BEFORE_MERGE", "x"));
     }
 
     @Test
+    @Order(1)
     @DisplayName("Check Repository URL")
-    public void testDetermineRepositoryURL() {
-        Main.startTimeTracker();
-        assertEquals(cryo.determineRepositoryURL(),true);
-//        assertEquals(cryo.getRepositoryURL(),new URL("https://github.com/fazer1929/backup"));
+    public void testDetermineRepositoryURL() throws MalformedURLException {
+        assertEquals(cryo.determineRepositoryURL(), true);
+        assertEquals(cryo.getRepositoryURL(), new URL("https://github.com/fazer1929/backup"));
     }
 
-//    @Test
-//    @DisplayName("Check Operation Center Creation")
-//    public void testCreateOperationCenter(){
-//        assertEquals(cryo.createOperationCenter(),true);
-//    }
-//
-//    @Test
-//    @DisplayName("Check Operation Center Creation")
-//    public void testCreateOperationCenter(){
-//        assertEquals(cryo.createOperationCenter(),true);
-//    }
+    @Test
+    @Order(2)
+    @DisplayName("Check determining current branch")
+    public void testDetermineCurrentBranch() {
+        assertEquals(cryo.determineCurrentBranch(), true);
+    }
 
+    @Test
+    @Order(3)
+    @DisplayName("Check operation center creation")
+    public void testCreateOperationCenter() {
+        assertEquals(cryo.createOperationCenter(), true);
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Check Fetch PR list")
+    public void testFetchPRList() throws MalformedURLException {
+        assertEquals(cryo.fetchPRList(repoURL), true);
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Check future branch setup")
+    public void testSetupFutureBranch() throws MalformedURLException {
+        cryo.fetchPRList(repoURL);
+        assertEquals(cryo.setUpFutureBranch(), true);
+
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Check single PR merge")
+    public void testMergeSinglePR() throws MalformedURLException {
+        assertEquals(cryo.create_storage(), true);
+    }
 
     @AfterAll
     @DisplayName("Removing Downloaded Files/Directories")
-    public static void removeDir(){
-        ProcessBuilder processBuilder = new ProcessBuilder(new String[]{"rm","-rf","backup"});
-        ExecuteProcess executeProcess= new ExecuteProcess(processBuilder);
-//        executeProcess.getProcessResult();
-
+    public static void removeDir() {
+        ProcessBuilder processBuilder = new ProcessBuilder(new String[] { "rm", "-rf", "backup" });
+        ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
+        executeProcess.getProcessResult();
     }
 }
