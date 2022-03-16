@@ -432,7 +432,7 @@ public class Cryo {
         }
     }
 
-    protected void createStorage() {
+    protected void createStorage() throws Exception {
         if (!init()) {
             Main.log(Level.WARNING, "Failed to initialize, check previous errors.");
             return;
@@ -467,7 +467,7 @@ public class Cryo {
      *
      * @return
      */
-    protected boolean setUpFutureBranch() {
+    protected boolean setUpFutureBranch() throws Exception {
         if (this.branch.endsWith(this.suffix)) {
             this.futureBranch = this.branch;
             Main.log(Level.WARNING,

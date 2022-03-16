@@ -22,7 +22,7 @@ public class CryoTest {
         cryo = new CryoAccess();
         cryo.setUpCryo(repoURL);
         Main.startTimeTracker();
-        System.out.println(System.setProperty("NO_STOP_BEFORE_MERGE", "x"));
+        System.out.println("\n\nExecuted\n\n");
     }
 
     @Test
@@ -42,33 +42,32 @@ public class CryoTest {
 
     @Test
     @Order(3)
-    @DisplayName("Check operation center creation")
-    public void testCreateOperationCenter() {
-        assertEquals(cryo.createOperationCenter(), true);
-    }
-
-    @Test
-    @Order(4)
     @DisplayName("Check Fetch PR list")
     public void testFetchPRList() throws MalformedURLException {
         assertEquals(cryo.fetchPRList(repoURL), true);
     }
 
     @Test
-    @Order(5)
+    @Order(4)
     @DisplayName("Check future branch setup")
-    public void testSetupFutureBranch() throws MalformedURLException {
+    public void testSetupFutureBranch() throws Exception {
         cryo.fetchPRList(repoURL);
         assertEquals(cryo.setUpFutureBranch(), true);
-
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     @DisplayName("Check single PR merge")
     public void testMergeSinglePR() throws MalformedURLException {
-        assertEquals(cryo.create_storage(), true);
+        assertEquals(cryo.mergeSinglePR(), true);
     }
+
+//    @Test
+//    @Order(6)
+//    @DisplayName("Check PR merge with Dependency")
+//    public void testMergePRWithDependency() throws MalformedURLException {
+//        assertEquals(cryo.mergePRWithDependency(), true);
+//    }
 
     @AfterAll
     @DisplayName("Removing Downloaded Files/Directories")

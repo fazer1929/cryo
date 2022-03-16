@@ -1,11 +1,14 @@
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.config.AphroditeConfig;
@@ -18,29 +21,30 @@ import org.jboss.set.aphrodite.repository.services.github.GithubPullRequestHomeS
 import org.jboss.set.aphrodite.spi.AphroditeException;
 import org.jboss.set.cryo.Cryo;
 import org.jboss.set.cryo.process.ExecuteProcess;
+import org.jboss.set.cryo.staging.OperationResult;
 
 public class CryoAccess extends Cryo {
-    // public static List<String> createIncludeList(String... prs) {
-    // List<String> includeList = Arrays.asList();
-    // for(String pr:prs){
-    // includeList.add(pr);
-    // }
-    // return includeList;
-    // }
-    public static List<String> createIncludeList() {
-        List<String> includeList = Arrays.asList("4");
-        return includeList;
+
+    public static List<String> createIncludeList(String[] includeList) {
+        List<String> include;
+        if (includeList != null) {
+            include = new ArrayList<>();
+            for (String pr : includeList)
+                include.add(pr);
+        } else
+            include = Arrays.asList("4");
+        return include;
     }
 
     CryoAccess() {
         super(new File(System.getProperty("user.dir") + "/backup/"), true, false, false, new HashSet<String>(),
-                CryoAccess.createIncludeList(), "future", "", new String[] {});
+                CryoAccess.createIncludeList(null), "future", "", new String[] {});
 
     }
 
-    CryoAccess(final File directory, final boolean dryRun, final boolean invertPullRequests, final boolean checkPRState,
-            Set<String> excludeSet, List<String> includeList, String suffix, String opsCore, String[] mavenArgs) {
-        super(directory, dryRun, invertPullRequests, checkPRState, excludeSet, includeList, suffix, opsCore, mavenArgs);
+    CryoAccess(String[] includeList) {
+        super(new File(System.getProperty("user.dir") + "/backup/"), true, false, false, new HashSet<String>(),
+                CryoAccess.createIncludeList(includeList), "future", "", new String[] {});
 
     }
 
@@ -110,25 +114,30 @@ public class CryoAccess extends Cryo {
         this.createOperationCenter();
         this.initializeAphrodite();
     }
-
-    private void cleanupFutureBranch() {
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                new String[] { "cd", System.getProperty("user.dir") + "/backup/" });
+    private void countCommits(){
+         ProcessBuilder processBuilder = new ProcessBuilder(
+                new String[] { "git", "rev-list", "--count","master" });
         ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
         executeProcess.getProcessResult();
 
-        processBuilder = new ProcessBuilder(
-                new String[] { "git", "checkout", "master" });
-        executeProcess = new ExecuteProcess(processBuilder);
-        executeProcess.getProcessResult();
-
-        processBuilder = new ProcessBuilder(
-                new String[] { "git", "branch", "-D", "masterfuture" });
-        executeProcess = new ExecuteProcess(processBuilder);
-        executeProcess.getProcessResult();
     }
 
-    public boolean setUpFutureBranch() {
+    private void cleanupFutureBranch() {
+        String testDir = System.getProperty("user.dir") + "/backup/";
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                new String[] { "git","checkout","master"});
+        processBuilder.directory(new File(testDir));
+        ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
+        executeProcess.getProcessResult();
+        processBuilder = new ProcessBuilder(
+                new String[] { "git","branch","-D","masterfuture"});
+        processBuilder.directory(new File(testDir));
+        executeProcess = new ExecuteProcess(processBuilder);
+        executeProcess.getProcessResult();
+
+    }
+
+    public boolean setUpFutureBranch() throws Exception {
         if (super.setUpFutureBranch()) {
             cleanupFutureBranch();
             return true;
@@ -136,13 +145,19 @@ public class CryoAccess extends Cryo {
         return false;
     }
 
-    public boolean create_storage() {
+    public boolean mergeSinglePR() {
+        countCommits();
         try {
+
             cleanupFutureBranch();
             super.createStorage();
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean mergePRWithDependency() {
+        return false;
     }
 }
