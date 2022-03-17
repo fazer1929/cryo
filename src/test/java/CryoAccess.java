@@ -1,14 +1,10 @@
 import java.io.File;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.config.AphroditeConfig;
@@ -20,8 +16,8 @@ import org.jboss.set.aphrodite.repository.services.common.RepositoryType;
 import org.jboss.set.aphrodite.repository.services.github.GithubPullRequestHomeService;
 import org.jboss.set.aphrodite.spi.AphroditeException;
 import org.jboss.set.cryo.Cryo;
+import org.jboss.set.cryo.process.BisectablePullRequest;
 import org.jboss.set.cryo.process.ExecuteProcess;
-import org.jboss.set.cryo.staging.OperationResult;
 
 public class CryoAccess extends Cryo {
 
@@ -45,7 +41,6 @@ public class CryoAccess extends Cryo {
     CryoAccess(String[] includeList) {
         super(new File(System.getProperty("user.dir") + "/backup/"), true, false, false, new HashSet<String>(),
                 CryoAccess.createIncludeList(includeList), "future", "", new String[] {});
-
     }
 
     public boolean createOperationCenter() {
@@ -114,27 +109,19 @@ public class CryoAccess extends Cryo {
         this.createOperationCenter();
         this.initializeAphrodite();
     }
-    private void countCommits(){
-         ProcessBuilder processBuilder = new ProcessBuilder(
-                new String[] { "git", "rev-list", "--count","master" });
-        ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
-        executeProcess.getProcessResult();
-
-    }
 
     private void cleanupFutureBranch() {
         String testDir = System.getProperty("user.dir") + "/backup/";
         ProcessBuilder processBuilder = new ProcessBuilder(
-                new String[] { "git","checkout","master"});
+                new String[] { "git", "checkout", "master" });
         processBuilder.directory(new File(testDir));
         ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
         executeProcess.getProcessResult();
         processBuilder = new ProcessBuilder(
-                new String[] { "git","branch","-D","masterfuture"});
+                new String[] { "git", "branch", "-D", "masterfuture" });
         processBuilder.directory(new File(testDir));
         executeProcess = new ExecuteProcess(processBuilder);
         executeProcess.getProcessResult();
-
     }
 
     public boolean setUpFutureBranch() throws Exception {
@@ -145,19 +132,42 @@ public class CryoAccess extends Cryo {
         return false;
     }
 
-    public boolean mergeSinglePR() {
-        countCommits();
-        try {
+    private boolean checkShaExists() {
+        // Getting latest commit ids of every eligible PR
+        List<String> shas = new ArrayList<>();
+        for (BisectablePullRequest bpr : coldStorage) {
+            shas.add(bpr.getPullRequest().getCommits().get(0).getSha());
+        }
+        System.out.println(shas);
+        boolean includesAll = true;
 
+        // Getting the logs of directory cryo created
+        String testDir = System.getProperty("user.dir") + "/backup/";
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                new String[] { "git", "log" });
+        processBuilder.directory(new File(testDir));
+        ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);
+        String logs = executeProcess.getProcessResult().getOutput();
+
+        // Checking id all the commits exist
+        for (String sha : shas) {
+            includesAll = logs.contains(sha);
+            if (!includesAll)
+                break;
+        }
+        return includesAll;
+    }
+
+    public boolean mergePRs() {
+        try {
             cleanupFutureBranch();
             super.createStorage();
-            return true;
+            if (checkShaExists())
+                return true;
+            return false;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean mergePRWithDependency() {
-        return false;
-    }
 }

@@ -6,6 +6,7 @@ import java.net.URL;
 import org.jboss.set.cryo.Main;
 import org.jboss.set.cryo.process.ExecuteProcess;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -22,7 +23,6 @@ public class CryoTest {
         cryo = new CryoAccess();
         cryo.setUpCryo(repoURL);
         Main.startTimeTracker();
-        System.out.println("\n\nExecuted\n\n");
     }
 
     @Test
@@ -59,15 +59,26 @@ public class CryoTest {
     @Order(5)
     @DisplayName("Check single PR merge")
     public void testMergeSinglePR() throws MalformedURLException {
-        assertEquals(cryo.mergeSinglePR(), true);
+        assertEquals(cryo.mergePRs(), true);
     }
 
-//    @Test
-//    @Order(6)
-//    @DisplayName("Check PR merge with Dependency")
-//    public void testMergePRWithDependency() throws MalformedURLException {
-//        assertEquals(cryo.mergePRWithDependency(), true);
-//    }
+    @Test
+    @Order(6)
+    @DisplayName("Check PR merge with Dependency")
+    public void testMergemultiplePRs() throws MalformedURLException {
+        cryo = new CryoAccess(new String[] { "1", "2" });
+        cryo.setUpCryo(repoURL);
+        assertEquals(cryo.mergePRs(), true);
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Check PR merge with Dependency")
+    public void testMergePRWithDependency() throws MalformedURLException {
+        cryo = new CryoAccess(new String[] { "3", "4" });
+        cryo.setUpCryo(repoURL);
+        assertEquals(cryo.mergePRs(), true);
+    }
 
     @AfterAll
     @DisplayName("Removing Downloaded Files/Directories")
