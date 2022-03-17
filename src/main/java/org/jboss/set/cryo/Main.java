@@ -67,9 +67,12 @@ public class Main {
 //            e.printStackTrace();
 //        }
 //    }
+public static void startTimeTracker() {
+    TIME_TRACKER.start();
+}
 
-    public static void main(String[] args) throws Exception {
-        TIME_TRACKER.start();
+public static void main(String[] args) throws Exception {
+        startTimeTracker();
           // NOTE: does not seem we need args? branchName, URL etc can be retrieved from repo.
         ArgumentParser parser = ArgumentParsers.newArgumentParser("cryo");
         parser.description("Hadny dandy contraption to create some branch. Clone clean repo, check PRs you want. Do a dry run for fun and safety(push might be manual step after verification).");
