@@ -119,6 +119,13 @@
             <artifactId>jboss-logmanager</artifactId>
             <version>${version.org.jboss.logmanager}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -174,6 +181,7 @@
                             <artifactId>wildfly-build-config</artifactId>
                             <version>${org.wildfly.wildfly.build.config.version}</version>
                         </dependency>
+
                     </dependencies>
                     <executions>
                         <execution>
