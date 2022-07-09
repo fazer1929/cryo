@@ -27,7 +27,7 @@ import java.net.URL;
 
 import org.jboss.set.cryo.process.ExecuteProcess;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -35,16 +35,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CryoTest {
+public class TestCryo {
     private CryoAccess cryo;
     private String repoURL;
-    protected static final String[] COMMAND_REMOVE_TEST_DIR = new String[] { "rm", "-rf", "cryo-tests" };
+    protected static final String[] COMMAND_REMOVE_TEST_DIR = new String[]{"rm", "-rf", "cryo-tests"};
 
-    CryoTest() throws MalformedURLException {
+    TestCryo() throws MalformedURLException {
         repoURL = "https://github.com/jboss-set/cryo-tests";
         cryo = new CryoAccess();
+        System.setProperty("aphrodite.config", "/home/abagrawa/Desktop/aphrodite.properties.json");
+    }
+
+    @BeforeEach
+    public void setup() throws MalformedURLException {
         cryo.setUpCryo(repoURL);
-        System.setProperty("aphrodite.config","/home/abagrawa/Desktop/aphrodite.properties.json");
     }
 
     @Test
