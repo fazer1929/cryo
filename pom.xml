@@ -20,12 +20,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-
         <checkstyle.plugin.version>2.15</checkstyle.plugin.version>
 
         <org.jboss.jboss-dmr.version>1.1.6.Final</org.jboss.jboss-dmr.version>
         <org.wildfly.wildfly.build.config.version>8.0.0.Final</org.wildfly.wildfly.build.config.version>
-        <version.org.jboss.set.aphrodite>0.7.18.Final-SNAPSHOT</version.org.jboss.set.aphrodite>
+        <version.org.jboss.set.aphrodite>0.7.16.Final</version.org.jboss.set.aphrodite>
         <version.org.freemarker.freemarker>2.3.23</version.org.freemarker.freemarker>
         <version.net.sourceforge.argparse4j>0.7.0</version.net.sourceforge.argparse4j>
         <version.mockito>1.9.5</version.mockito>
@@ -91,18 +90,6 @@
             <version>${version.net.sourceforge.argparse4j}</version>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${version.testng}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${version.mockito}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>${version.org.jboss.logging}</version>
@@ -119,11 +106,10 @@
             <artifactId>jboss-logmanager</artifactId>
             <version>${version.org.jboss.logmanager}</version>
         </dependency>
-
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

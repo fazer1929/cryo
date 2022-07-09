@@ -20,94 +20,79 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jboss.set.cryo.process.ExecuteProcess;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCryo {
-    private CryoAccess cryo;
-    private String repoURL;
+    private static CryoAccess cryo;
+    private static String repoURL;
     protected static final String[] COMMAND_REMOVE_TEST_DIR = new String[]{"rm", "-rf", "cryo-tests"};
 
-    TestCryo() throws MalformedURLException {
+    public TestCryo() throws MalformedURLException {
         repoURL = "https://github.com/jboss-set/cryo-tests";
         cryo = new CryoAccess();
         System.setProperty("aphrodite.config", "/home/abagrawa/Desktop/aphrodite.properties.json");
+        cryo.setUpCryo(repoURL);
+
     }
 
-    @BeforeEach
-    public void setup() throws MalformedURLException {
-        cryo.setUpCryo(repoURL);
+    @BeforeClass
+    public static void setup() throws MalformedURLException {
+        System.out.println("Lol");
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Check Repository URL")
-    public void testDetermineRepositoryURL() throws MalformedURLException {
+    public void test1DetermineRepositoryURL() throws MalformedURLException {
         assertEquals(cryo.determineRepositoryURL(), true);
         assertEquals(cryo.getRepositoryURL(), new URL(repoURL));
     }
 
     @Test
-    @Order(2)
-    @DisplayName("Check determining current branch")
-    public void testDetermineCurrentBranch() {
+    public void test2DetermineCurrentBranch() {
         assertEquals(cryo.determineCurrentBranch(), true);
     }
 
     @Test
-    @Order(3)
-    @DisplayName("Check Fetch PR list")
-    public void testFetchPRList() throws MalformedURLException {
+    public void test3FetchPRList() throws MalformedURLException {
         assertEquals(cryo.fetchPRList(repoURL), true);
     }
 
     @Test
-    @Order(4)
-    @DisplayName("Check future branch setup")
-    public void testSetupFutureBranch() throws Exception {
+    public void test4SetupFutureBranch() throws Exception {
         cryo.fetchPRList(repoURL);
         assertEquals(cryo.setUpFutureBranch(), true);
     }
 
     @Test
-    @Order(5)
-    @DisplayName("Check single PR merge")
-    public void testMergeSinglePR() throws MalformedURLException {
+    public void test5MergeSinglePR() throws MalformedURLException {
         assertEquals(cryo.mergePRs(), true);
     }
 
     @Test
-    @Order(6)
-    @DisplayName("Check multiple PR merge")
-    public void testMergemultiplePRs() throws MalformedURLException {
-        cryo = new CryoAccess(new String[] { "2", "3" });
+    public void test6MergemultiplePRs() throws MalformedURLException {
+        cryo = new CryoAccess(new String[]{"2", "3"});
         cryo.setUpCryo(repoURL);
         assertEquals(cryo.mergePRs(), true);
     }
 
     @Test
-    @Order(7)
-    @DisplayName("Check PR merge with Dependency")
-    public void testMergePRWithDependency() throws MalformedURLException {
-        cryo = new CryoAccess(new String[] { "10","11","12" });
+    public void test7MergePRWithDependency() throws MalformedURLException {
+        cryo = new CryoAccess(new String[]{"10", "11", "12"});
         cryo.setUpCryo(repoURL);
         assertEquals(cryo.mergePRs(), true);
     }
 
-    @AfterAll
-    @DisplayName("Removing Downloaded Files/Directories")
+    @AfterClass
     public static void removeDir() {
         ProcessBuilder processBuilder = new ProcessBuilder(COMMAND_REMOVE_TEST_DIR);
         ExecuteProcess executeProcess = new ExecuteProcess(processBuilder);

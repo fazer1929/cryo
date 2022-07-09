@@ -90,7 +90,7 @@ public class CryoAccess extends Cryo {
     public void initializeAphrodite() throws MalformedURLException {
 
         RepositoryConfig githubService = new RepositoryConfig("https://github.com/", "fazer1929",
-                "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",
+                "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",
                 RepositoryType.GITHUB);
         List<RepositoryConfig> repositoryConfigs = new ArrayList<>();
         repositoryConfigs.add(githubService);
